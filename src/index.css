@@ -122,3 +122,47 @@ body {
   border: 1px solid #b45309;
   color: #fde68a;
 }
+
+.balance {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.network-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.network-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.chain-id {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+}
+
+.badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.badge-ok {
+  background: #052e16;
+  border: 1px solid #15803d;
+  color: #86efac;
+}
+
+.badge-warn {
+  background: #422006;
+  border: 1px solid #b45309;
+  color: #fde68a;
+}
