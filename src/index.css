@@ -166,3 +166,55 @@ body {
   border: 1px solid #b45309;
   color: #fde68a;
 }
+.form-group {
+  margin-bottom: 14px;
+}
+
+.field-label {
+  display: block;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  font-family: monospace;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+.input:disabled {
+  opacity: 0.6;
+}
+
+.card .alert {
+  margin-bottom: 14px;
+}
+
+.tx-status {
+  margin-bottom: 14px;
+}
+
+.tx-gap {
+  margin-top: 14px;
+}
+
+.badge-error {
+  background: #450a0a;
+  border: 1px solid #b91c1c;
+  color: #fecaca;
+}
+
+.card a {
+  color: #a5b4fc;
+}

@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import WalletInfo from "./components/WalletInfo";
+import SendETH from "./components/SendETH";
+import TransactionInfo from "./components/TransactionInfo";
 import {
   connectWallet,
   getBalance,
@@ -16,6 +18,7 @@ function App() {
   const [account, setAccount] = useState(null);
   const [balance, setBalance] = useState(null);
   const [network, setNetwork] = useState(null);
+  const [txInfo, setTxInfo] = useState(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -57,6 +60,48 @@ function App() {
     restoreConnection();
   }, []);
 
+  // NEW: listens for changes made inside MetaMask (account or network switches).
+  useEffect(() => {
+    if (!isMetaMaskInstalled()) return;
+
+    function handleAccountsChanged(accounts) {
+     
+
+      // If the user clicked Disconnect in our app, don't reconnect silently.
+      if (localStorage.getItem(DISCONNECT_FLAG) === "true") return;
+
+      if (accounts.length === 0) {
+        // MetaMask was locked, or the site's permission was removed.
+        setAccount(null);
+        setBalance(null);
+        setNetwork(null);
+        setTxInfo(null);
+      } else {
+        setError("");
+        setAccount(accounts[0]);
+        loadWalletData(accounts[0]);
+      }
+    }
+
+    function handleChainChanged(chainIdHex) {
+      
+
+      if (account) {
+        setError("");
+        loadWalletData(account);
+      }
+    }
+
+    window.ethereum.on("accountsChanged", handleAccountsChanged);
+    window.ethereum.on("chainChanged", handleChainChanged);
+
+    // Cleanup: remove the listeners so we never end up with duplicates.
+    return () => {
+      window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
+      window.ethereum.removeListener("chainChanged", handleChainChanged);
+    };
+  }, [account]);
+
   async function handleConnect() {
     setError("");
 
@@ -89,6 +134,7 @@ function App() {
     setAccount(null);
     setBalance(null);
     setNetwork(null);
+    setTxInfo(null);
     setError("");
   }
 
@@ -120,13 +166,21 @@ function App() {
         )}
 
         {account ? (
-          <WalletInfo
-            account={account}
-            balance={balance}
-            network={network}
-            isLoading={isLoading}
-            onRefresh={handleRefresh}
-          />
+          <>
+            <WalletInfo
+              account={account}
+              balance={balance}
+              network={network}
+              isLoading={isLoading}
+              onRefresh={handleRefresh}
+            />
+            <SendETH
+              account={account}
+              onTxUpdate={setTxInfo}
+              onTxConfirmed={() => loadWalletData(account)}
+            />
+            <TransactionInfo tx={txInfo} />
+          </>
         ) : (
           <div className="card">
             <p className="label">Not connected</p>

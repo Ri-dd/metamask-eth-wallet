@@ -70,3 +70,45 @@ export async function getNetworkInfo() {
 export function shortenAddress(address) {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
+
+// Works out the sender's balance and the worst-case gas cost of a plain ETH transfer.
+// All values are BigInt amounts in Wei.
+export async function estimateTransfer(from, to, valueWei) {
+  const provider = new ethers.BrowserProvider(window.ethereum);
+
+  const balanceWei = await provider.getBalance(from);
+  const gasLimit = await provider.estimateGas({ from, to, value: valueWei });
+  const feeData = await provider.getFeeData();
+
+  // maxFeePerGas is the ceiling the network may charge per unit of gas.
+  const pricePerGas = feeData.maxFeePerGas ?? feeData.gasPrice;
+  if (pricePerGas === null || pricePerGas === undefined) {
+    throw new Error("Could not read the current gas price.");
+  }
+
+  const gasCostWei = gasLimit * pricePerGas;
+  return { balanceWei, gasCostWei };
+}
+
+// Asks MetaMask to send ETH. MetaMask shows a popup and the user approves or rejects.
+// Returns the transaction object (it has .hash) as soon as it is submitted.
+export async function sendEth(to, valueWei) {
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  const signer = await provider.getSigner();
+
+  const tx = await signer.sendTransaction({
+    to: to,
+    value: valueWei,
+  });
+
+  return tx;
+}
+
+// True if the error means "the user clicked Reject in MetaMask".
+export function isUserRejection(err) {
+  return (
+    err?.code === "ACTION_REJECTED" ||
+    err?.code === 4001 ||
+    err?.info?.error?.code === 4001
+  );
+}
